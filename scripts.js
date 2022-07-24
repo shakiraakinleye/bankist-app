@@ -56,6 +56,7 @@ const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
 
+// MOVEMENTS HTML CREATION AND DISPLAY
 const displayMovements = function () {
   containerMovements.innerHTML = "";
 
@@ -68,7 +69,29 @@ const displayMovements = function () {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 }
-
 displayMovements();
+
+
+// CALC AND DISPLAY BALANCE
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((sum, mov, i) => sum + mov, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+calcDisplayBalance(account2.movements);
+  
+
+// USERNAME CREATION AND ADDITION TO THE ACCOUNTS
+function createUsername(accs) {
+  accs.forEach(function(acc) {
+  acc.username = acc.owner
+    .toLowerCase()
+    .split(" ")
+    .map(function (name) {
+      return name[0];
+    })
+    .join("");
+})
+};
+createUsername(accounts);
 
 
