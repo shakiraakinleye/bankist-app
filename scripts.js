@@ -57,10 +57,10 @@ const inputClosePin = document.querySelector(".form__input--pin");
 
 
 // MOVEMENTS HTML CREATION AND DISPLAY
-const displayMovements = function () {
+const displayMovements = function (movements) {
   containerMovements.innerHTML = "";
 
-  account1.movements.forEach(function (mov, i) {
+  movements.forEach(function (mov, i) {
     const type = mov > 1 ? "deposit" : "withdrawal";
     const html = `<div class="movements__row">
          <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
@@ -69,7 +69,6 @@ const displayMovements = function () {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 }
-displayMovements();
 
 
 // CALC AND DISPLAY BALANCE
@@ -77,7 +76,6 @@ const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((sum, mov, i) => sum + mov, 0);
   labelBalance.textContent = `${balance} ₤`;
 };
-calcDisplayBalance(account2.movements);
   
 
 
@@ -124,7 +122,6 @@ const calcDisplaySummary = function (movement) {
 //   labelSumInterest.textContent = `${depositInterest} ₤`;
 // };
 
-calcDisplaySummary(account1.movements);
 
 
 // USERNAME CREATION AND ADDITION TO THE ACCOUNTS
@@ -147,24 +144,30 @@ let currentAccount;
 btnLogin.addEventListener('click', function (e) {
   // Prevents the form from reloading when btn is clicked
   e.preventDefault();
-  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value)
+  currentAccount = accounts.find(
+    (acc) => acc.username === inputLoginUsername.value
+  );
   // console.log(currentAccount);
 
-  
   if (currentAccount?.pin === Number(inputLoginPin.value)) {
-    // To display the welcome message 
+    // To display the welcome message
     labelWelcome.textContent = `Welcome back, ${currentAccount.owner
       .split(" ")
       .at(0)}`;
-    
+
     // To display the UI
     containerApp.style.opacity = 1;
 
-    
+    // To display movements
+    displayMovements(currentAccount.movements);
   }
-    
-    
-    
-  console.log("LOGIN");
 
+  // To display balance
+  calcDisplayBalance(currentAccount.movements);
+
+  // To display summary
+  calcDisplaySummary(currentAccount.movements);
+
+
+  console.log("LOGIN");
 })
