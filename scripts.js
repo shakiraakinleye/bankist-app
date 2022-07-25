@@ -29,7 +29,6 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
-
 const labelWelcome = document.querySelector(".welcome");
 const labelDate = document.querySelector(".date");
 const labelBalance = document.querySelector(".balance__value");
@@ -55,73 +54,47 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
-
 // MOVEMENTS HTML CREATION AND DISPLAY
-const displayMovements = function (movements) {
+const displayMovements = function (acc) {
   containerMovements.innerHTML = "";
 
-  movements.forEach(function (mov, i) {
+  acc.movements.forEach(function (mov, i) {
     const type = mov > 1 ? "deposit" : "withdrawal";
     const html = `<div class="movements__row">
-         <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+         <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
          <div class="movements__value">${mov}</div>
         </div>`;
-    containerMovements.insertAdjacentHTML('afterbegin', html);
+    containerMovements.insertAdjacentHTML("afterbegin", html);
   });
-}
-
+};
 
 // CALC AND DISPLAY BALANCE
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((sum, mov, i) => sum + mov, 0);
-  labelBalance.textContent = `${balance} ₤`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((sum, mov, i) => sum + mov, 0);
+  labelBalance.textContent = `${acc.balance} ₤`;
 };
-  
-
 
 // CALC AND DISPLAY SUMMARY
-// MY WAY
-const calcDisplaySummary = function (movement) {
-  const sumIn = movement.reduce(
+const calcDisplaySummary = function (acc) {
+  const sumIn = acc.movements.reduce(
     (sum, mov, i) => (mov > 0 ? sum + mov : sum),
     0
   );
-  const sumOut = movement.reduce(
+  const sumOut = acc.movements.reduce(
     (sum, mov, i) => (mov < 0 ? sum + mov : sum),
     0
   );
-  let rate = currentAccount.interestRate / 100;
-  const depositInterest = movement
+  const depositInterest = acc.movements
     .filter((mov) => mov > 0)
-    .map((deposit) => deposit * rate)
+    .map((deposit) => deposit * acc.interestRate /100)
     .reduce((sum, int) => (sum = int >= 1 ? sum + int : sum), 0);
 
   labelSumIn.textContent = `${sumIn} ₤`;
   labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
   labelSumInterest.textContent = `${depositInterest} ₤`;
 };
-
-// const calcDisplaySummary = function (acc) {
-//   const sumIn = acc.movement.reduce(
-//     (sum, mov, i) => (mov > 0 ? sum + mov : sum),
-//     0
-//   );
-//   const sumOut = movement.reduce(
-//     (sum, mov, i) => (mov < 0 ? sum + mov : sum),
-//     0
-//   );
-//   const depositInterest = movement
-//     .filter((mov) => mov > 0)
-//     .map((deposit) => deposit * acc.interestRate)
-//     .reduce((sum, int) => (sum = int >= 1 ? sum + int : sum), 0);
-
-//   labelSumIn.textContent = `${sumIn} ₤`;
-//   labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
-//   labelSumInterest.textContent = `${depositInterest} ₤`;
-// };
-
-
-
 
 // SAME FUNCTION AS ABOVE USING CHAINING
 // const calcDisplaySummary = function (movement) {
@@ -145,25 +118,31 @@ const calcDisplaySummary = function (movement) {
 // };
 
 
+const updateUI = function (acc) {
+  displayMovements(acc);
+  calcDisplayBalance(acc);
+  calcDisplaySummary(acc);
+}
+
 
 // USERNAME CREATION AND ADDITION TO THE ACCOUNTS
 function createUsername(accs) {
-  accs.forEach(function(acc) {
-  acc.username = acc.owner
-    .toLowerCase()
-    .split(" ")
-    .map(function (name) {
-      return name[0];
-    })
-    .join("");
-})
-};
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(" ")
+      .map(function (name) {
+        return name[0];
+      })
+      .join("");
+  });
+}
 createUsername(accounts);
-
 
 let currentAccount;
 
-btnLogin.addEventListener('click', function (e) {
+// LOGIN
+btnLogin.addEventListener("click", function (e) {
   // Prevents the form from reloading when btn is clicked
   e.preventDefault();
   currentAccount = accounts.find(
@@ -186,16 +165,78 @@ btnLogin.addEventListener('click', function (e) {
     // Remove focus from inputPin field
     inputLoginPin.blur();
 
-    // To display movements
-    displayMovements(currentAccount.movements);
+    // To display movements, balance and summary 
+    updateUI(currentAccount);
   }
+});
 
-  // To display balance
-  calcDisplayBalance(currentAccount.movements);
+// TRANSFER 
+btnTransfer.addEventListener("click", function (e) {
+  e.preventDefault();
+  const amount = inputTransferAmount.value;
+  const receiverAcct = accounts.find(acc => acc.username === inputTransferTo.value);
 
-  // To display summary
-  // MY WAY
-  calcDisplaySummary(currentAccount.movements);
+  if (
+    amount > 0 &&
+    currentAccount.balance >= amount &&
+    receiverAcct &&
+    currentAccount.username !== receiverAcct?.username
+  ) {
+    receiverAcct.movements.push(+amount);
+    currentAccount.movements.push(-amount);
+    updateUI(currentAccount);
+    console.log(currentAccount.balance, receiverAcct.balance);
+  }
+    // Empty the transfer input fields
+    inputTransferAmount.value = inputTransferTo.value = "";
 
-  // calcDisplaySummary(currentAccount);
+    // Remove focus from inputTransferAmount field
+    inputTransferAmount.blur();
+  });
+;
+
+// REQUEST LOAN
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  loanAmount = Number(inputLoanAmount.value);
+  if (loanAmount > 0 && currentAccount.movements.some(mov => mov >= (loanAmount * 0.1))) {
+    // Add loan to account movements
+    currentAccount.movements.push(+loanAmount);
+    updateUI(currentAccount);
+    // Empty the loan input field
+    inputLoanAmount.value = "";
+
+    // Remove focus from loan input field
+    inputLoanAmount.blur();
+  }
 })
+
+
+// CLOSE ACCOUNT
+
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+  const closeUser = inputCloseUsername.value;
+  const closePin = Number(inputClosePin.value);
+  if (
+    currentAccount.username === closeUser &&
+    currentAccount.pin === closePin
+  ) {
+    // find account's index in accounts array
+    const index = accounts.findIndex(
+      (acc) => acc.username === currentAccount.username
+    );
+    // Delete account
+    accounts.splice(index, 1);
+    // Hide UI
+    containerApp.style.opacity = 0;
+  }
+  // Empty the close account input fields
+  inputCloseUsername.value = inputClosePin.value = "";
+
+  // Remove focus from inputClosePin field
+  inputClosePin.blur();
+})
+
+
+
