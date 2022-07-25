@@ -80,6 +80,7 @@ const calcDisplayBalance = function (movements) {
 
 
 // CALC AND DISPLAY SUMMARY
+// MY WAY
 const calcDisplaySummary = function (movement) {
   const sumIn = movement.reduce(
     (sum, mov, i) => (mov > 0 ? sum + mov : sum),
@@ -89,15 +90,36 @@ const calcDisplaySummary = function (movement) {
     (sum, mov, i) => (mov < 0 ? sum + mov : sum),
     0
   );
+  let rate = currentAccount.interestRate / 100;
   const depositInterest = movement
     .filter((mov) => mov > 0)
-    .map((deposit) => deposit * 0.012)
+    .map((deposit) => deposit * rate)
     .reduce((sum, int) => (sum = int >= 1 ? sum + int : sum), 0);
 
   labelSumIn.textContent = `${sumIn} ₤`;
   labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
   labelSumInterest.textContent = `${depositInterest} ₤`;
 };
+
+// const calcDisplaySummary = function (acc) {
+//   const sumIn = acc.movement.reduce(
+//     (sum, mov, i) => (mov > 0 ? sum + mov : sum),
+//     0
+//   );
+//   const sumOut = movement.reduce(
+//     (sum, mov, i) => (mov < 0 ? sum + mov : sum),
+//     0
+//   );
+//   const depositInterest = movement
+//     .filter((mov) => mov > 0)
+//     .map((deposit) => deposit * acc.interestRate)
+//     .reduce((sum, int) => (sum = int >= 1 ? sum + int : sum), 0);
+
+//   labelSumIn.textContent = `${sumIn} ₤`;
+//   labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
+//   labelSumInterest.textContent = `${depositInterest} ₤`;
+// };
+
 
 
 
@@ -172,8 +194,8 @@ btnLogin.addEventListener('click', function (e) {
   calcDisplayBalance(currentAccount.movements);
 
   // To display summary
+  // MY WAY
   calcDisplaySummary(currentAccount.movements);
 
-
-  console.log("LOGIN");
+  // calcDisplaySummary(currentAccount);
 })
