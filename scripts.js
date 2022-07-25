@@ -75,10 +75,57 @@ displayMovements();
 // CALC AND DISPLAY BALANCE
 const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((sum, mov, i) => sum + mov, 0);
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${balance} ₤`;
 };
 calcDisplayBalance(account2.movements);
   
+
+
+// CALC AND DISPLAY SUMMARY
+const calcDisplaySummary = function (movement) {
+  const sumIn = movement.reduce(
+    (sum, mov, i) => (mov > 0 ? sum + mov : sum),
+    0
+  );
+  const sumOut = movement.reduce(
+    (sum, mov, i) => (mov < 0 ? sum + mov : sum),
+    0
+  );
+  const depositInterest = movement
+    .filter((mov) => mov > 0)
+    .map((deposit) => deposit * 0.012)
+    .reduce((sum, int) => (sum = int >= 1 ? sum + int : sum), 0);
+
+  labelSumIn.textContent = `${sumIn} ₤`;
+  labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
+  labelSumInterest.textContent = `${depositInterest} ₤`;
+};
+
+
+
+// SAME FUNCTION AS ABOVE USING CHAINING
+// const calcDisplaySummary = function (movement) {
+//   const sumIn = movement.reduce(
+//     (sum, mov, i) => (mov > 0 ? sum + mov : sum),
+//     0
+//   );
+//   const sumOut = movement.reduce(
+//     (sum, mov, i) => (mov < 0 ? sum + mov : sum),
+//     0
+//   );
+//   const depositInterest = movement
+//     .filter((mov) => mov > 0)
+//     .map((deposit) => deposit * 0.012)
+//     .filter((int) => int >= 1)
+//     .reduce((sum, int) => sum + int, 0);
+
+//   labelSumIn.textContent = `${sumIn} ₤`;
+//   labelSumOut.textContent = `${Math.abs(sumOut)} ₤`;
+//   labelSumInterest.textContent = `${depositInterest} ₤`;
+// };
+
+calcDisplaySummary(account1.movements);
+
 
 // USERNAME CREATION AND ADDITION TO THE ACCOUNTS
 function createUsername(accs) {
