@@ -158,6 +158,12 @@ btnLogin.addEventListener('click', function (e) {
     // To display the UI
     containerApp.style.opacity = 1;
 
+    // Empty the login input fields
+    inputLoginUsername.value = inputLoginPin.value = "";
+
+    // Remove focus from inputPin field
+    inputLoginPin.blur();
+
     // To display movements
     displayMovements(currentAccount.movements);
   }
