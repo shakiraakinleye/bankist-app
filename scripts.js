@@ -142,3 +142,29 @@ function createUsername(accs) {
 createUsername(accounts);
 
 
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e) {
+  // Prevents the form from reloading when btn is clicked
+  e.preventDefault();
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value)
+  // console.log(currentAccount);
+
+  
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // To display the welcome message 
+    labelWelcome.textContent = `Welcome back, ${currentAccount.owner
+      .split(" ")
+      .at(0)}`;
+    
+    // To display the UI
+    containerApp.style.opacity = 1;
+
+    
+  }
+    
+    
+    
+  console.log("LOGIN");
+
+})
