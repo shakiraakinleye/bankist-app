@@ -55,10 +55,12 @@ const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
 
 // MOVEMENTS HTML CREATION AND DISPLAY
-const displayMovements = function (acc) {
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = "";
 
-  acc.movements.forEach(function (mov, i) {
+  const movs = sort ? acc.movements.slice().sort((a, b) => a - b) : acc.movements;
+  
+  movs.forEach(function (mov, i) {
     const type = mov > 1 ? "deposit" : "withdrawal";
     const html = `<div class="movements__row">
          <div class="movements__type movements__type--${type}">${
@@ -140,6 +142,27 @@ function createUsername(accs) {
 createUsername(accounts);
 
 let currentAccount;
+
+
+
+
+// // FAKE ALWATS LOGGED IN 
+// currentAccount = account1;
+// updateUI(currentAccount);
+// containerApp.style.opacity = 1;
+
+// const now = new Date();
+// const day = `${now.getDate()}`.padStart(2, 0);;
+// const month = `${now.getMonth()}`.padStart(2, '0'); 
+// const year = now.getFullYear();
+// const hour = now.getHours();
+// const min = now.getMinutes();
+
+// labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`
+
+
+
+
 
 // LOGIN
 btnLogin.addEventListener("click", function (e) {
@@ -238,5 +261,13 @@ btnClose.addEventListener('click', function (e) {
   inputClosePin.blur();
 })
 
+//  Create a state variable
+let sorted = false;
+btnSort.addEventListener("click", function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount, !sorted);
+  // To flip the state variable so we a go back and forth between the states 
+  sorted = !sorted;
+});
 
 
